@@ -38,9 +38,10 @@ void printFlowMatrix(Matrix matrix)
             else if (i < 2)
                 setTextColor(GRAY);
             else if (i < matrix.length - 2)
-                if(randomNumber(0,2))
+                if (randomNumber(0, 2))
                     setTextColor(GREEN);
-                else setTextColor(DARK_GREEN);
+                else
+                    setTextColor(DARK_GREEN);
             else
                 setTextColor(DARK_GREEN);
 
@@ -49,14 +50,12 @@ void printFlowMatrix(Matrix matrix)
     }
 }
 
-
-
 Matrix initMatrix()
 {
-    
+
     Matrix m;
     m.x = randomNumber(0, 80);
-    m.y = randomNumber(-50, 0);
+    m.y = randomNumber(100, 150);
     m.length = randomNumber(10, 20);
     return m;
 }
@@ -74,15 +73,23 @@ void updateAllMatrix()
     // system("cls");
     for (int i = 0; i < numMatrix; i++)
     {
-        clearCharAt(matrix[i].x, matrix[i].y - matrix[i].length);
-        matrix[i].y++;
-
         int matrixTail = matrix[i].y - matrix[i].length;
+        if (matrix[i].y < 150)
+        {
+            if (matrixTail < 25)
+                clearCharAt(matrix[i].x, matrix[i].y - matrix[i].length);
+            matrix[i].y++;
+        }
+        else
+            matrix[i].y = 0;
+
+
+        matrixTail = matrix[i].y - matrix[i].length;
         if (matrix[i].y >= 0 && matrixTail < 25)
         {
             printFlowMatrix(matrix[i]);
         }
-        else if (matrixTail >= 25)
+        else if (matrixTail == 25)
         {
             matrix[i] = initMatrix();
         }

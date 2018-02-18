@@ -7,16 +7,39 @@ _Matrix    struc
     len db  ?    
     _Matrix ends
 
-matrix   _Matrix    <80>
+matrix      _Matrix    <80>
+temp_matrix     _Matrix <0>
     .code
     
     org     0100h
     
 main:
-    mov     dh,03h
-    mov     dl,6h
+
+    mov     dx,0h
+    sub     dx,50h
+
+    sub     dx,1h
+    not     dx
+
+    call    test_print
+    ret
+
+init_all_matrix:
+    mov     dh,0h                   ;random number between 0 to 80
+    mov     dl,50h
     call    random_number
 
+    mov     [temp_matrix.x],dl      ;store random(0,80) to temp_matrix.x
+
+
+    
+    
+
+
+
+    
+
+test_print:
     mov     ah,0ah
     mov     al,'P'
     mov     bh,0h
@@ -24,11 +47,9 @@ main:
     mov     cx,dx
 
     int     10h
-
-
-
     ret
-
+init_matrix:
+    
 
 random_number:              ;random number from dh to dl
     push    dx
@@ -48,11 +69,10 @@ random_number:              ;random number from dh to dl
     pop     cx              ;pop [from,to] -> cx
 
     mov     cl,ch
-    mov     ch,0h
+    mov     ch,0h           
     
     add     dx,cx
-
-
+    ret
 exit:
     ret
 end main
