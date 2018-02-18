@@ -1,3 +1,8 @@
-REM @echo off
+@echo off
+del matrix.exe
 g++ matrix.c -o matrix.exe
-matrix
+
+if EXIST matrix.exe (
+    cls
+    matrix.exe
+)

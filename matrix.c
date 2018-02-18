@@ -4,10 +4,10 @@
 #include <time.h>
 #include <windows.h>
 
-int WHITE =0xF;
-int GRAY =0x8;
-int GREEN =0xA;
-int DARK_GREEN =0x2;
+int WHITE = 0xF;
+int GRAY = 0x8;
+int GREEN = 0xA;
+int DARK_GREEN = 0x2;
 
 typedef struct _matrix
 {
