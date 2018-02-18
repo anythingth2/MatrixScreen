@@ -53,6 +53,7 @@ void printFlowMatrix(Matrix matrix)
 
 Matrix initMatrix()
 {
+    
     Matrix m;
     m.x = randomNumber(0, 80);
     m.y = randomNumber(-50, 0);
@@ -114,8 +115,6 @@ void setTextColor(int color)
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
     SetConsoleTextAttribute(hConsole, color);
-
-    // textcolor(color);
 }
 void printCharAt(int x, int y)
 {
