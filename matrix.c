@@ -23,6 +23,7 @@ void gotoxy(int x, int y);
 void setTextColor(int color);
 void printCharAt(int x, int y);
 void clearCharAt(int x, int y);
+int randomNumber(int from, int to);
 
 void printFlowMatrix(Matrix matrix)
 {
@@ -37,7 +38,9 @@ void printFlowMatrix(Matrix matrix)
             else if (i < 2)
                 setTextColor(GRAY);
             else if (i < matrix.length - 2)
-                setTextColor(GREEN);
+                if(randomNumber(0,2))
+                    setTextColor(GREEN);
+                else setTextColor(DARK_GREEN);
             else
                 setTextColor(DARK_GREEN);
 
@@ -46,7 +49,7 @@ void printFlowMatrix(Matrix matrix)
     }
 }
 
-int randomNumber(int from, int to);
+
 
 Matrix initMatrix()
 {
@@ -129,7 +132,5 @@ void clearCharAt(int x, int y)
 
 int randomNumber(int from, int to)
 {
-    // srand(time(NULL));
-
     return rand() % (to - from) + from;
 }
