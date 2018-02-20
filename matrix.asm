@@ -5,27 +5,44 @@
 iLoopPFM            db      0   ; For Loop in printFlowMatrix
 matrixColorCode     db      0fh,08h,0Ah,02h,0Ah,0Ah,02h,0Ah,02h,0Ah,02h,0Ah,02h,02h,00h
 matrixY             db      80  dup(0)
+i           db  0
+
+num_Matrix  db  5h
+matrixY     db  80  dup(0)
+
+
     .code
     
     org     0100h
     
 main:
-    push    ax
-    push    bx
-    push    cx
-    push    dx
+   
 
-; go to function printFlowMatrix    
-    mov     ax,0
-    mov     ah,x    ;;PFM(int x,int matrixY)
-    mov     al,matrix_y
+    
+    
+init_all_matrix:
+    mov     cx,0h
+    mov     cl,num_Matrix                   ;set number of for loop running
+loop_init_all_matrix:
+    mov     dh,64h                          ;random number (100,150)
+    mov     dl,96h
+    call    random_number
+    
+    mov     si,cx
+    mov     matrixY[si],dl                  ;store random number to matrixY
+            
+    loop    loop_init_all_matrix 
 
-    call    printFlowMatrix
+    mov     dh,4h
+    mov     dl,6h
+    call    random_number
+    
+    mov     si,cx
+    mov     matrixY[si],dl
 
-    pop     dx
-    pop     cx
-    pop     bx
-    pop     ax
+
+
+    ret
 
 ;===== LOOP_printFlowMatrix =====
 printFlowMatrix:            ;For loop i<15
@@ -56,17 +73,23 @@ SecondIf_printFlowMatrix:
     jg      Exit_If
     ret
 If_condition:
-    push    ax
+  
     push    bx
     push    cx
     push    dx
 
-    call    setTestColorAndPrint
+    push    si
+    mov     dh,al
+    mov     dl,ah
+    mov     si,[iLoopPFM]
+    mov     bl,matrixColorCode[si]
+    call    printCharAt
     
+    pop     si
     pop     dx
     pop     cx
     pop     bx
-    pop     ax
+
 
     ret
 Exit_If:
@@ -74,6 +97,43 @@ Exit_If:
 ;#### End If in printFlowMatrix ####
 
 ;===== EndLOOP_printFlowMatrix =====
+ 
+
+update_all_matrix:
+    mov     cx,0h
+    mov     cl,[num_Matrix]
+loop_update_all_matrix:
+    mov     si,cx                           ;make si to index point "i"
+
+    cmp     matrixY[si],150                 ;if matrix[i] < 150
+    jl      ifLessThan150
+    jge     ifNotLessThan150
+endIfLessThan150:
+
+
+    cmp     matrixY[si],40                  ;if matrix[i] < 40
+    jl      ifLessThan40
+    je      ifEqual40
+endIfLessThan40:
+
+    loop    loop_update_all_matrix
+    ret
+
+ifLessThan150:
+    inc     matrixY[si]                     ;matrix[i]++;
+    jmp     endIfLessThan150
+ifNotLessThan150:
+    mov     matrixY[si],0h                  ;matrix[i]=0
+    jmp     endIfLessThan150
+
+ifLessThan40:
+    ;PRINT_FLOW_MATRIX
+    mov     ah,si
+    mov     al,matrixY[si]
+    jmp     endIfLessThan40
+ifEqual40:
+    mov     matrixY[si],40
+    jmp     endIfLessThan40
 
 random_number:              ;random number from dh to dl
     push    ax              ;backup value ax
@@ -104,7 +164,30 @@ random_number:              ;random number from dh to dl
     pop     ax
 
     ret
+printCharAt:                ;print random character at position (dh = row,dl = column)
+                            ;with color ( bl = color code)
+    push    ax
+    push    cx
 
+    mov     ah,02h                          
+    mov     bh,0h                           ;move cursor
+    int     10h                             ;call move cursor interrupt                                     
+
+    mov     dh,33
+    mov     dl,126
+    call    random_number                   ;random character decimal number
+
+
+    mov     ah,09h                          ;print O
+    mov     al,dl                           ;store character
+    mov     bh,0h                         
+    mov     cx,1h
+    int     10h                             ;call print character interrupt
+
+    pop     cx
+    pop     ax
+
+    ret
 exit:
     ret
 
