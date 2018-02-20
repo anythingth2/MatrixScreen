@@ -21,31 +21,26 @@ num_Matrix  db  5h
 main:
     
 
-    lea     bx,matrix[0]
-    mov     [bx],8h
-    inc     bx
-    mov     [bx],8h
-    inc     bx
-    mov     [bx],3h
+    ; lea     bx,matrix[0]
+    ; mov     [bx],8h
+    ; inc     bx
+    ; mov     [bx],8h
+    ; inc     bx
+    ; mov     [bx],3h
     
 
     
-    lea     bx,matrix[0]
-    add     bx,1h
-    mov     cx,[bx]
-    call    test_print
+    ; lea     bx,matrix[0]
+    ; add     bx,1h
+    ; mov     cx,[bx]
+    ; call    test_print
     ; ret
 
 
     ret
 init_all_matrix:
-   
-
     mov     cx,0h
     mov     cl,num_Matrix                   ;set number of for loop running
-
-
-
 loop_init_all_matrix:
 
     call    init_matrix
