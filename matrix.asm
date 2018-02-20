@@ -2,13 +2,14 @@
     ; .stack  0100h
 
     .data   
-iLoopPFM            db      0   ; For Loop in printFlowMatrix
-matrixColorCode     db      0fh,08h,0Ah,02h,0Ah,0Ah,02h,0Ah,02h,0Ah,02h,0Ah,02h,02h,00h
+iLoopPFM            dw      0   ; For Loop in printFlowMatrix
+matrixColorCode     db      00000000b,00000000b,00001010b,00000010b,00001010b,00001010b,00000010b,00001010b,00000010b,00001010b,00000010b,00001010b,00000010b,00000010b,00001000b,00001111b
 matrixY             db      80  dup(0)
 i           db  0
+seed        dw  13
 
-num_Matrix  db  5h
-matrixY     db  80  dup(0)
+num_Matrix  db  80
+
 
 
     .code
@@ -16,10 +17,9 @@ matrixY     db  80  dup(0)
     org     0100h
     
 main:
-   
-
-    
-    
+    mov     ah,00
+    mov     al,03h
+    int     10h
 init_all_matrix:
     mov     cx,0h
     mov     cl,num_Matrix                   ;set number of for loop running
@@ -40,108 +40,128 @@ loop_init_all_matrix:
     mov     si,cx
     mov     matrixY[si],dl
 
-
+main_loop:
+    
+    call    update_all_matrix
+    
+    call    sleep
+    jmp     main_loop
 
     ret
 
 ;===== LOOP_printFlowMatrix =====
-printFlowMatrix:            ;For loop i<15
-    sub     al,iLoopPFM
-
-    call    If_printFlowMatrix:
-
-    add     iLoopPFM,1
-    cmp     iLoopPFM,15
-    je      exit_LoopPrintFlowMatrix
-
-    jmp     printFlowMatrix
-    ret
-
-exit_LoopPrintFlowMatrix:
-    ret
-;#### If in printFlowMatrix ####
-If_printFlowMatrix:
-    cmp     al,1
-    jg      SecondIf_printFlowMatrix
-
-    jl      Exit_If
-    ret
-SecondIf_printFlowMatrix:
-    cmp     al,25
-    jl      If_condition
-
-    jg      Exit_If
-    ret
-If_condition:
-  
-    push    bx
+printFlowMatrix:            ;print Matrix Flow
+    ;require   al,ah
+    ;
+    
     push    cx
-    push    dx
+    mov     cx,15           ;print Matrix length is 15 character
+loop_printFlowMatrix:
 
-    push    si
+  
+    sub     al,1h
+    cmp     al,0                ;if character not in screen
+    jge     ifGreaterThan0      ;will not print
+
+EndIfGreaterThan0:
+    loop    loop_printFlowMatrix
+
     mov     dh,al
     mov     dl,ah
-    mov     si,[iLoopPFM]
-    mov     bl,matrixColorCode[si]
-    call    printCharAt
+    push    si
+    push    cx
     
-    pop     si
-    pop     dx
+    mov     si,cx
+
+    mov     bl,matrixColorCode[si]          ;set character color
     pop     cx
-    pop     bx
+    pop     si
+    call    printCharAt                     ;print character to screen at row,column
 
+    pop     cx
+    ret
+ifGreaterThan0:
+    cmp     al,25
+    jl      ifLessThan25
+    jmp     EndIfGreaterThan0
+EndIfGreaterThan25:
 
-    ret
-Exit_If:
-    ret
+    jmp     EndIfGreaterThan0
+ifLessThan25:
+    mov     dh,al
+    mov     dl,ah
+    push    si
+    push    cx
+
+    mov     si,cx
+
+    mov     bl,matrixColorCode[si]          ;set character color
+    pop     cx
+    pop     si
+    call    printCharAt                     ;print character to screen at row,column
+    jmp     EndIfGreaterThan0           
 ;#### End If in printFlowMatrix ####
 
 ;===== EndLOOP_printFlowMatrix =====
  
 
-update_all_matrix:
-    mov     cx,0h
-    mov     cl,[num_Matrix]
+update_all_matrix:                          ;move matrix down
+    mov     cx,80                       
 loop_update_all_matrix:
+    
     mov     si,cx                           ;make si to index point "i"
 
-    cmp     matrixY[si],150                 ;if matrix[i] < 150
-    jl      ifLessThan150
-    jge     ifNotLessThan150
-endIfLessThan150:
-
-
+    add     matrixY[si],1      
     cmp     matrixY[si],40                  ;if matrix[i] < 40
     jl      ifLessThan40
     je      ifEqual40
 endIfLessThan40:
 
+    
     loop    loop_update_all_matrix
+
     ret
 
-ifLessThan150:
-    inc     matrixY[si]                     ;matrix[i]++;
-    jmp     endIfLessThan150
-ifNotLessThan150:
-    mov     matrixY[si],0h                  ;matrix[i]=0
-    jmp     endIfLessThan150
 
 ifLessThan40:
     ;PRINT_FLOW_MATRIX
-    mov     ah,si
+    
+    mov     ax,cx
+    mov     ah,al
+  
     mov     al,matrixY[si]
+
+    call    printFlowMatrix
+
     jmp     endIfLessThan40
 ifEqual40:
-    mov     matrixY[si],40
+  
+    push    dx
+    mov     dh,0
+    mov     dl,50
+    call    random_number           ;if head matrix on botton screen
+                                    ;start new matrix
+
+    neg     dl
+    mov     matrixY[si],dl
+
+    pop     dx
     jmp     endIfLessThan40
 
 random_number:              ;random number from dh to dl
+    
     push    ax              ;backup value ax
     push    cx              ;backup value cx
     
+
     push    dx
-    mov     ah,2ch          ;call get system interrupt
-    int     21h             ;to dx
+
+    mov     ax,seed
+    mov     cx,13
+    mul     cx
+    add     ax,23
+    mov     seed,ax
+    
     
     mov     ax,dx           ;store system time to ax
     pop     dx              ;pop [from,to] -> dx
@@ -166,6 +186,7 @@ random_number:              ;random number from dh to dl
     ret
 printCharAt:                ;print random character at position (dh = row,dl = column)
                             ;with color ( bl = color code)
+    ; call    test_print
     push    ax
     push    cx
 
@@ -173,12 +194,12 @@ printCharAt:                ;print random character at position (dh = row,dl = c
     mov     bh,0h                           ;move cursor
     int     10h                             ;call move cursor interrupt                                     
 
-    mov     dh,33
+    mov     dh,48
     mov     dl,126
     call    random_number                   ;random character decimal number
 
 
-    mov     ah,09h                          ;print O
+    mov     ah,09h                          ;print character
     mov     al,dl                           ;store character
     mov     bh,0h                         
     mov     cx,1h
@@ -188,6 +209,16 @@ printCharAt:                ;print random character at position (dh = row,dl = c
     pop     ax
 
     ret
+
+sleep:
+    push    cx
+    mov     cx,0ffffh
+loop_sleep:
+    nop                                     ;do nothing
+    loop    loop_sleep                 ;loop until cx is zero
+    pop     cx
+    ret
+
 exit:
     ret
 
