@@ -8,6 +8,7 @@ int WHITE = 0xF;
 int GRAY = 0x8;
 int GREEN = 0xA;
 int DARK_GREEN = 0x2;
+int BLACK = 0x0;
 
 typedef struct _matrix
 {
@@ -25,6 +26,23 @@ void printCharAt(int x, int y);
 void clearCharAt(int x, int y);
 int randomNumber(int from, int to);
 
+int matrixColorCode[] = {
+    WHITE,
+    GRAY,
+    GREEN,
+    DARK_GREEN,
+    GREEN,
+    GREEN,
+    DARK_GREEN,
+    GREEN,
+    DARK_GREEN,
+    GREEN,
+    DARK_GREEN,
+    GREEN,
+    DARK_GREEN,
+    DARK_GREEN,
+    BLACK
+    };
 void printFlowMatrix(Matrix matrix)
 {
 
@@ -33,38 +51,41 @@ void printFlowMatrix(Matrix matrix)
         int y = matrix.y - i;
         if (y >= 0 && y < 25)
         {
-            if (i == 0)
-                setTextColor(WHITE);
-            else if (i < 2)
-                setTextColor(GRAY);
-            else if (i < matrix.length - 2)
-                if (randomNumber(0, 2))
-                    setTextColor(GREEN);
-                else
-                    setTextColor(DARK_GREEN);
-            else
-                setTextColor(DARK_GREEN);
+            // if (i == 0)
+            //     setTextColor(WHITE);
+            // else if (i < 2)
+            //     setTextColor(GRAY);
+            // else if (i < matrix.length - 2)
+            //     if (randomNumber(0, 2))
+            //         setTextColor(GREEN);
+            //     else
+            //         setTextColor(DARK_GREEN);
+            // else
+            //     setTextColor(DARK_GREEN);
+            setTextColor(matrixColorCode[i]);
 
             printCharAt(matrix.x, matrix.y - i);
         }
     }
 }
 
-Matrix initMatrix()
-{
+// Matrix initMatrix()
+// {
 
-    Matrix m;
-    m.x = randomNumber(0, 80);
-    m.y = randomNumber(100, 150);
-    m.length = randomNumber(10, 20);
-    return m;
-}
+//     Matrix m;
+//     m.x = randomNumber(0, 80);
+//     m.y = randomNumber(100, 150);
+//     m.length = 15;
+//     return m;
+// }
 
 void initAllMatrix()
 {
     for (int i = 0; i < numMatrix; i++)
     {
-        matrix[i] = initMatrix();
+        matrix[i].x = i;
+        matrix[i].y = randomNumber(100, 150);
+        matrix[i].length = 15;
     }
 }
 
@@ -73,26 +94,15 @@ void updateAllMatrix()
     // system("cls");
     for (int i = 0; i < numMatrix; i++)
     {
-        int matrixTail = matrix[i].y - matrix[i].length;
         if (matrix[i].y < 150)
-        {
-            if (matrixTail < 25)
-                clearCharAt(matrix[i].x, matrix[i].y - matrix[i].length);
             matrix[i].y++;
-        }
         else
             matrix[i].y = 0;
 
-
-        matrixTail = matrix[i].y - matrix[i].length;
-        if (matrix[i].y >= 0 && matrixTail < 25)
-        {
+        if (matrix[i].y < 40)
             printFlowMatrix(matrix[i]);
-        }
-        else if (matrixTail == 25)
-        {
-            matrix[i] = initMatrix();
-        }
+        else if (matrix[i].y == 40)
+            matrix[i].y = randomNumber(100, 150);
     }
 }
 
@@ -126,7 +136,6 @@ void setTextColor(int color)
 void printCharAt(int x, int y)
 {
     gotoxy(x, y);
-
     printf("%c", randomNumber(33, 126));
 }
 
