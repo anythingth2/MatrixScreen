@@ -157,10 +157,11 @@ random_number:              ;random number from dh to dl
     push    dx
 
     mov     ax,seed
-    mov     cx,13
+    mov     cx,17
     mul     cx
-    add     ax,23
+    add     ax,31
     mov     seed,ax
+    mov     dx,ax
     
     
     mov     ax,dx           ;store system time to ax
@@ -180,6 +181,8 @@ random_number:              ;random number from dh to dl
     
     add     dx,cx           ;ret random number to dx
 
+    
+
     pop     cx              ;give value back
     pop     ax
 
@@ -194,7 +197,7 @@ printCharAt:                ;print random character at position (dh = row,dl = c
     mov     bh,0h                           ;move cursor
     int     10h                             ;call move cursor interrupt                                     
 
-    mov     dh,48
+    mov     dh,33
     mov     dl,126
     call    random_number                   ;random character decimal number
 
